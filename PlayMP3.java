@@ -8,13 +8,14 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import static com.lamnn.demoservice.App.CHANNEL_ID;
+import static com.lamnn.demoservice.SongAdapter.EXTRA_PATH;
+import static com.lamnn.demoservice.SongAdapter.EXTRA_TITLE;
+
 
 public class PlayMP3 extends Service {
 
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer mMediaPlayer;
     private String mPath;
     private String mTitle;
 
@@ -36,15 +37,14 @@ public class PlayMP3 extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v("framgia", intent.getExtras().getString("path"));
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
         }
-        mPath = intent.getExtras().getString("path");
-        mTitle = intent.getExtras().getString("title");
-        mediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(mPath));
+        mPath = intent.getExtras().getString(EXTRA_PATH);
+        mTitle = intent.getExtras().getString(EXTRA_TITLE);
+        mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(mPath));
 
-        mediaPlayer.start();
+        mMediaPlayer.start();
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -62,7 +62,7 @@ public class PlayMP3 extends Service {
 
     @Override
     public void onDestroy() {
-        mediaPlayer.release();
+        mMediaPlayer.release();
         super.onDestroy();
     }
 }

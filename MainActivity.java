@@ -1,28 +1,24 @@
 package com.lamnn.demoservice;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button buttonStart, buttonNext, buttonPrev;
-    private RecyclerView recyclerViewListSong;
-    private RecyclerView.Adapter songAdapter;
-    private RecyclerView.LayoutManager songLayoutManager;
-    private SongManager songManager;
+    private Button mButtonStart, mButtonNext, mButtonPrev;
+    private RecyclerView mRecyclerViewListSong;
+    private RecyclerView.Adapter mSongAdapter;
+    private RecyclerView.LayoutManager mSongLayoutManager;
+    private SongManager mSongManager;
     public ArrayList<HashMap<String, String>> listSong;
 
     private static final int REQUEST_ID_READ_PERMISSION = 100;
@@ -31,20 +27,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        buttonStart = findViewById(R.id.button_play);
-        buttonNext = findViewById(R.id.button_next);
-        buttonPrev = findViewById(R.id.button_prev);
+        mButtonStart = findViewById(R.id.button_play);
+        mButtonNext = findViewById(R.id.button_next);
+        mButtonPrev = findViewById(R.id.button_prev);
 
-        recyclerViewListSong = findViewById(R.id.list_songs);
+        mRecyclerViewListSong = findViewById(R.id.recycle_list_songs);
 
-        songLayoutManager = new LinearLayoutManager(this);
-        recyclerViewListSong.setLayoutManager(songLayoutManager);
+        mSongLayoutManager = new LinearLayoutManager(this);
+        mRecyclerViewListSong.setLayoutManager(mSongLayoutManager);
 
-        songManager = new SongManager();
-        listSong = songManager.getPlayList();
-        songAdapter = new SongAdapter(listSong);
+        mSongManager = new SongManager();
+        listSong = mSongManager.getPlayList();
+        mSongAdapter = new SongAdapter(listSong);
 
-        recyclerViewListSong.setAdapter(songAdapter);
+        mRecyclerViewListSong.setAdapter(mSongAdapter);
 
 
         askPermission(REQUEST_ID_READ_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);

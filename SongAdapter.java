@@ -13,11 +13,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SongAdapter extends RecyclerView.Adapter<SongHolder>{
+    static final String EXTRA_PATH = "PATH";
+    static final String EXTRA_TITLE = "TITLE";
 
-    private ArrayList<HashMap<String, String>> songList;
+    private ArrayList<HashMap<String, String>> mListSong;
 
     public SongAdapter(ArrayList<HashMap<String, String>> userList) {
-        songList = userList;
+        mListSong = userList;
     }
 
 
@@ -29,16 +31,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull SongHolder songHolder,final int i) {
-        songHolder.itemName.setText(songList.get(i).get("songTitle"));
+        songHolder.mItemName.setText(mListSong.get(i).get("songTitle"));
         songHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), songList.get(i).get("songPath") ,Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), mListSong.get(i).get("songPath") ,Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(v.getContext(), PlayMP3.class);
                 Bundle bundle = new Bundle();
 
-                bundle.putString("path",songList.get(i).get("songPath"));
-                bundle.putString("title",songList.get(i).get("songTitle"));
+                bundle.putString(EXTRA_PATH,mListSong.get(i).get("songPath"));
+                bundle.putString(EXTRA_TITLE,mListSong.get(i).get("songTitle"));
                 intent.putExtras(bundle);
                 v.getContext().startService(intent);
             }
@@ -48,6 +50,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongHolder>{
 
     @Override
     public int getItemCount() {
-        return songList.size();
+        return mListSong.size();
     }
 }
