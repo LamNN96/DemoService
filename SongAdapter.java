@@ -1,55 +1,79 @@
 package com.lamnn.demoservice;
 
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class SongAdapter extends RecyclerView.Adapter<SongHolder>{
-    static final String EXTRA_PATH = "PATH";
-    static final String EXTRA_TITLE = "TITLE";
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
-    private ArrayList<HashMap<String, String>> mListSong;
+    private ArrayList<Song> mSongs;
+    private LayoutInflater mInflater;
+    private OnItemClickListener mListener;
 
-    public SongAdapter(ArrayList<HashMap<String, String>> userList) {
-        mListSong = userList;
+    SongAdapter(ArrayList<Song> songs, OnItemClickListener listener) {
+        mSongs = songs;
+        mListener = listener;
     }
 
 
     @NonNull
     @Override
-    public SongHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new SongHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_song, viewGroup, false));
+    public SongViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        if (mInflater == null){
+            mInflater = LayoutInflater.from(viewGroup.getContext());
+        }
+        View view = mInflater.inflate(R.layout.item_song, viewGroup, false);
+        return  new SongViewHolder(view, mListener);
+
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SongHolder songHolder,final int i) {
-        songHolder.mItemName.setText(mListSong.get(i).get("songTitle"));
-        songHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), mListSong.get(i).get("songPath") ,Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(v.getContext(), PlayMP3.class);
-                Bundle bundle = new Bundle();
-
-                bundle.putString(EXTRA_PATH,mListSong.get(i).get("songPath"));
-                bundle.putString(EXTRA_TITLE,mListSong.get(i).get("songTitle"));
-                intent.putExtras(bundle);
-                v.getContext().startService(intent);
-            }
-        });
-
+    public void onBindViewHolder(@NonNull SongViewHolder songViewHolder, int i) {
+        songViewHolder.bindView(mSongs.get(i));
     }
+
+
 
     @Override
     public int getItemCount() {
-        return mListSong.size();
+        return mSongs != null ? mSongs.size() : 0;
     }
+
+    public interface OnItemClickListener {
+        void onItemClick(Song song);
+    }
+
+    static class SongViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private OnItemClickListener mOnItemClickListener;
+        private TextView mTextName;
+        private Song mSong;
+
+        SongViewHolder(@NonNull View itemView, OnItemClickListener listener) {
+            super(itemView);
+            mOnItemClickListener = listener;
+            mTextName = itemView.findViewById(R.id.text_item_name);
+            itemView.setOnClickListener(this);
+        }
+
+        void bindView(Song song) {
+            if (song != null)  mSong = song;
+            else return;
+            mTextName.setText(song.getTitle());
+        }
+
+
+        @Override
+        public void onClick(View view) {
+            if (mOnItemClickListener == null){
+                return;
+            }
+            mOnItemClickListener.onItemClick(mSong);
+        }
+    }
+
 }

@@ -4,37 +4,37 @@ import android.os.Environment;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class SongManager {
 
-    final String MEDIA_PATH = Environment.getExternalStorageDirectory().toString();
-    private ArrayList<HashMap<String, String>> mListSong = new ArrayList<>();
+    private static final String MEDIA_PATH = Environment.getExternalStorageDirectory().toString();
+    private static final String MEDIA_EXTENSION = ".MP3";
+
 
     public SongManager() {
-
     }
 
-    public ArrayList<HashMap<String, String>> getPlayList() {
+    public ArrayList<Song> getPlayList() {
 
+        Song song;
         File home = new File(MEDIA_PATH);
+        ArrayList<Song> songs = new ArrayList<>();
         if (home.listFiles(new FileExtensionFilter()).length > 0) {
             for (File file : home.listFiles(new FileExtensionFilter())) {
-
-                HashMap<String, String> song = new HashMap<>();
-                song.put("songTitle", file.getName().substring(0, file.getName().length() - 4));
-                song.put("songPath", file.getPath());
-
-                mListSong.add(song);
+                song = new Song();
+                song.setPath(file.getPath());
+                song.setTitle(file.getName()
+                        .substring(0,
+                                file.getName().length() - MEDIA_EXTENSION.length()));
+                songs.add(song);
             }
-
         }
-        return mListSong;
+        return songs;
     }
 
     class FileExtensionFilter implements FilenameFilter {
         public boolean accept(File dir, String name) {
-            return (name.endsWith(".mp3") || name.endsWith(".MP3"));
+            return (name.endsWith(MEDIA_EXTENSION.toLowerCase()) || name.endsWith(MEDIA_EXTENSION));
         }
     }
 }

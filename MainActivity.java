@@ -2,68 +2,79 @@ package com.lamnn.demoservice;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Button;
+import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SongAdapter.OnItemClickListener, View.OnClickListener{
 
-    private Button mButtonStart, mButtonNext, mButtonPrev;
-    private RecyclerView mRecyclerViewListSong;
-    private RecyclerView.Adapter mSongAdapter;
-    private RecyclerView.LayoutManager mSongLayoutManager;
-    private SongManager mSongManager;
-    public ArrayList<HashMap<String, String>> listSong;
-
+    static final String EXTRA_PATH = "PATH";
+    static final String EXTRA_TITLE = "TITLE";
     private static final int REQUEST_ID_READ_PERMISSION = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mButtonStart = findViewById(R.id.button_play);
-        mButtonNext = findViewById(R.id.button_next);
-        mButtonPrev = findViewById(R.id.button_prev);
-
-        mRecyclerViewListSong = findViewById(R.id.recycle_list_songs);
-
-        mSongLayoutManager = new LinearLayoutManager(this);
-        mRecyclerViewListSong.setLayoutManager(mSongLayoutManager);
-
-        mSongManager = new SongManager();
-        listSong = mSongManager.getPlayList();
-        mSongAdapter = new SongAdapter(listSong);
-
-        mRecyclerViewListSong.setAdapter(mSongAdapter);
-
-
-        askPermission(REQUEST_ID_READ_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
+        initViews();
+        if (isAllowPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
+            showSongs(getSongs());
+        }
     }
 
-    private boolean askPermission(int requestId, String permissionName) {
+    private void initViews(){
+        findViewById(R.id.button_play).setOnClickListener(this);
+        findViewById(R.id.button_next).setOnClickListener(this);
+    }
+
+    private void showSongs(ArrayList<Song> songs){
+        RecyclerView recyclerView = findViewById(R.id.recycle_list_songs);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        SongAdapter adapter = new SongAdapter(songs,this);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private ArrayList<Song> getSongs(){
+        return new SongManager().getPlayList();
+    }
+
+    private boolean isAllowPermission(String permissionName) {
         if (android.os.Build.VERSION.SDK_INT >= 23) {
-
             int permission = ActivityCompat.checkSelfPermission(this, permissionName);
-
-
             if (permission != PackageManager.PERMISSION_GRANTED) {
-                this.requestPermissions(
-                        new String[]{permissionName},
-                        requestId
-                );
+                requestPermissions(new String[]{permissionName}, REQUEST_ID_READ_PERMISSION);
                 return false;
             }
+            return true;
         }
         return true;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            showSongs(getSongs());
+        }
+    }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            
+        }
+    }
 
-
+    @Override
+    public void onItemClick(Song song) {
+        startService(PlayMP3Service.getPlayIntent(getApplicationContext(), song));
+     }
 }
